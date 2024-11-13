@@ -15,7 +15,6 @@ pipeline {
     stages {
         stage('Parallel Execution') {
             parallel {
-                // Dynamically generating stages for agents
                 'Agent 1': {
                     agent { label 'Agent1' }
                     steps {
