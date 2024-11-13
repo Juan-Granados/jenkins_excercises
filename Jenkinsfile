@@ -6,72 +6,66 @@ pipeline {
         string(name: 'NAME3', defaultValue: 'Carlos', description: 'Name for the third agent')
         string(name: 'NAME4', defaultValue: 'Ana', description: 'Name for the fourth agent')
         string(name: 'NAME5', defaultValue: 'Pedro', description: 'Name for the fifth agent')
-
+    }
+    environment {
+        REPO_URL = 'https://github.com/Juan-Granados/jenkins_excercises'
+        JAR_PATH = 'target/jenkins_excercises-alpha.jar'
+        MAIN_CLASS = 'com.name_counter.App'
     }
     stages {
         stage('Parallel Execution') {
             parallel {
-                stage('Agent 1') {
+                // Dynamically generating stages for agents
+                'Agent 1': {
                     agent { label 'Agent1' }
                     steps {
                         script {
-                            echo 'Cloning repository'
-                            checkout scm
-                            echo 'Building with Maven'
-                            sh 'mvn clean install'
-                            sh 'java -cp target/jenkins_excercises-alpha.jar com.name_counter.App ${params.NAME1}'
+                            executeBuild(params.NAME1)
                         }
                     }
-                }
-                stage('Agent 2') {
+                },
+                'Agent 2': {
                     agent { label 'Agent2' }
                     steps {
                         script {
-                            echo 'Cloning repository'
-                            checkout scm
-                            echo 'Building with Maven'
-                            sh 'mvn clean install'
-                            sh 'java -cp target/jenkins_excercises-alpha.jar com.name_counter.App ${params.NAME2}'
+                            executeBuild(params.NAME2)
                         }
                     }
-                }
-                stage('Agent 3') {
+                },
+                'Agent 3': {
                     agent { label 'Agent3' }
                     steps {
                         script {
-                            echo 'Cloning repository'
-                            checkout scm
-                            echo 'Building with Maven'
-                            sh 'mvn clean install'
-                            sh 'java -cp target/jenkins_excercises-alpha.jar com.name_counter.App ${params.NAME3}'
+                            executeBuild(params.NAME3)
                         }
                     }
-                }
-                stage('Agent 4') {
+                },
+                'Agent 4': {
                     agent { label 'Agent4' }
                     steps {
                         script {
-                            echo 'Cloning repository'
-                            checkout scm
-                            echo 'Building with Maven'
-                            sh 'mvn clean install'
-                            sh 'java -cp target/jenkins_excercises-alpha.jar com.name_counter.App ${params.NAME4}'
+                            executeBuild(params.NAME4)
                         }
                     }
-                }
-                stage('Agent 5') {
+                },
+                'Agent 5': {
                     agent { label 'Agent5' }
                     steps {
                         script {
-                            echo 'Cloning repository'
-                            checkout scm
-                            echo 'Building with Maven'
-                            sh 'mvn clean install'
-                            sh 'java -cp target/jenkins_excercises-alpha.jar com.name_counter.App ${params.NAME5}'
+                            executeBuild(params.NAME5)
                         }
                     }
                 }
             }
         }
     }
+}
+
+def executeBuild(String name) {
+    echo "Cloning repository for ${name}"
+    checkout scm
+    echo 'Building with Maven'
+    sh 'mvn clean install'
+    echo "Running Java with ${name}"
+    sh "java -cp ${env.JAR_PATH} ${env.MAIN_CLASS} ${name}"
 }
