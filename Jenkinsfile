@@ -1,5 +1,5 @@
 pipeline {
-    agent none  // No global agent is assigned (since we'll use multiple agents in parallel)
+    agent none
     parameters {
         string(name: 'NAME1', defaultValue: 'Juan', description: 'Name for the first agent')
         string(name: 'NAME2', defaultValue: 'Maria', description: 'Name for the second agent')
@@ -13,45 +13,58 @@ pipeline {
         MAIN_CLASS = 'com.name_counter.App'
     }
     stages {
+        stage('Clone Repository') {
+            agent any
+            steps {
+                script {
+                    // Clone the repository only once on the first agent
+                    echo 'Cloning repository'
+                    git url: "${env.REPO_URL}", branch: 'main'
+                    
+                    // Stash the repository to be used by other agents
+                    stash name: 'repo', allowEmpty: true
+                }
+            }
+        }
         stage('Parallel Execution') {
             parallel {
-                'Agent 1': {
-                    agent { label 'Agent1' }
+                stage('Parallel Execution 1') {
+                    agent any
                     steps {
                         script {
-                            executeBuild(params.NAME1)
+                            executeBuild(params.NAME1, "Execution 1")
                         }
                     }
-                },
-                'Agent 2': {
-                    agent { label 'Agent2' }
+                }
+                stage('Parallel Execution 2') {
+                    agent any
                     steps {
                         script {
-                            executeBuild(params.NAME2)
+                            executeBuild(params.NAME2, "Execution 2")
                         }
                     }
-                },
-                'Agent 3': {
-                    agent { label 'Agent3' }
+                }
+                stage('Parallel Execution 3') {
+                    agent any
                     steps {
                         script {
-                            executeBuild(params.NAME3)
+                            executeBuild(params.NAME3, "Execution 3")
                         }
                     }
-                },
-                'Agent 4': {
-                    agent { label 'Agent4' }
+                }
+                stage('Parallel Execution 4') {
+                    agent any
                     steps {
                         script {
-                            executeBuild(params.NAME4)
+                            executeBuild(params.NAME4, "Execution 4")
                         }
                     }
-                },
-                'Agent 5': {
-                    agent { label 'Agent5' }
+                }
+                stage('Parallel Execution 5') {
+                    agent any
                     steps {
                         script {
-                            executeBuild(params.NAME5)
+                            executeBuild(params.NAME5, "Execution 5")
                         }
                     }
                 }
@@ -60,11 +73,45 @@ pipeline {
     }
 }
 
-def executeBuild(String name) {
-    echo "Cloning repository for ${name}"
-    checkout scm
-    echo 'Building with Maven'
-    sh 'mvn clean install'
-    echo "Running Java with ${name}"
-    sh "java -cp ${env.JAR_PATH} ${env.MAIN_CLASS} ${name}"
+def executeBuild(String name, String executionName) {
+    try {
+        // Display status to Jenkins UI
+        echo "Starting build for ${name} (${executionName})"
+
+        // Clean the workspace before proceeding
+        echo "Cleaning the workspace for ${name} (${executionName})"
+        cleanWs()
+
+        // Unstash the repository to the current agent workspace
+        echo "Unstashing repository for ${name} (${executionName})"
+        unstash 'repo'
+
+        // Build with Maven
+        echo "Building with Maven for ${name} (${executionName})"
+        bat 'mvn clean install'  // Adjusted for Windows
+
+        // Run the Java application
+        echo "Running Java with ${name} (${executionName})"
+        bat "java -cp ${env.JAR_PATH} ${env.MAIN_CLASS} ${name}"  // Adjusted for Windows
+
+        // Indicate success
+        echo "Build completed successfully for ${name} (${executionName})"
+    } catch (Exception e) {
+        // In case of failure, display an error message
+        echo "Build failed for ${name} (${executionName})"
+        currentBuild.result = 'FAILURE'
+        throw e
+    } finally {
+        // Clean up after execution, even if previous steps fail
+        echo "Cleaning up after execution for ${name} (${executionName})"
+        try {
+            timeout(time: 1, unit: 'SECONDS') {
+                retry(10) {
+                    cleanWs()  // Try cleaning workspace, but don't fail the pipeline if it fails
+                }
+            }
+        } catch (Exception cleanupEx) {
+            echo "Cleanup failed for ${name} (${executionName}) but continuing with the pipeline"
+        }
+    }
 }
