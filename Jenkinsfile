@@ -13,20 +13,6 @@ pipeline {
         MAIN_CLASS = 'com.name_counter.App'
     }
     stages {
-        stage('Clone Repository') {
-            agent any  // Runs on the principal (master) agent
-            steps {
-                script {
-                    // Stash the repository only once on the first agent
-                    echo 'Cloning repository'
-                    // The repository will be automatically cloned by Jenkins for the SCM checkout
-                    // No need to explicitly run the git step here, Jenkins does it automatically
-                    
-                    // Stash the repository for other agents
-                    stash name: 'repo', allowEmpty: true
-                }
-            }
-        }
         stage('Parallel Execution') {
             parallel {
                 stage('Parallel Execution 1') {
