@@ -18,7 +18,6 @@ pipeline {
                     agent any  // Can be any agent for parallel execution
                     steps {
                         script {
-                            sleep(1)  // Add delay to stagger execution
                             executeBuild(params.NAME1, "Execution 1")
                         }
                     }
@@ -27,7 +26,6 @@ pipeline {
                     agent any
                     steps {
                         script {
-                            sleep(2)  // Add a slightly larger delay for staggered start
                             executeBuild(params.NAME2, "Execution 2")
                         }
                     }
@@ -36,7 +34,6 @@ pipeline {
                     agent any
                     steps {
                         script {
-                            sleep(3)  // Increase delay further
                             executeBuild(params.NAME3, "Execution 3")
                         }
                     }
@@ -45,7 +42,6 @@ pipeline {
                     agent any
                     steps {
                         script {
-                            sleep(4)  // Increase delay further
                             executeBuild(params.NAME4, "Execution 4")
                         }
                     }
@@ -60,9 +56,8 @@ def executeBuild(String name, String executionName) {
         // Display status to Jenkins UI
         echo "Starting build for ${name} (${executionName})"
 
-        // Clean the workspace before proceeding
-        echo "Cleaning the workspace for ${name} (${executionName})"
-        cleanWs()
+        // wait for clone to end
+        sleep(3)
 
         // Build with Maven
         echo "Building with Maven for ${name} (${executionName})"
