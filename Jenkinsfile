@@ -14,15 +14,15 @@ pipeline {
     }
     stages {
         stage('Clone Repository') {
-
             agent any  // Runs on the principal (master) agent
             steps {
                 script {
-                    // Clone the repository only once on the principal agent
+                    // Stash the repository only once on the first agent
                     echo 'Cloning repository'
-                    git url: "${env.REPO_URL}", branch: 'main'
-
-                    // Stash the repository so other agents can access it
+                    // The repository will be automatically cloned by Jenkins for the SCM checkout
+                    // No need to explicitly run the git step here, Jenkins does it automatically
+                    
+                    // Stash the repository for other agents
                     stash name: 'repo', allowEmpty: true
                 }
             }
@@ -30,7 +30,6 @@ pipeline {
         stage('Parallel Execution') {
             parallel {
                 stage('Parallel Execution 1') {
-
                     agent any  // Can be any agent for parallel execution
                     steps {
                         script {
