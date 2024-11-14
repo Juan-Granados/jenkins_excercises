@@ -19,6 +19,7 @@ pipeline {
                     agent any  // Can be any agent for parallel execution
                     steps {
                         script {
+                            sleep(1)  // Add delay to stagger execution
                             executeBuild(params.NAME1, "Execution 1")
                         }
                     }
@@ -27,6 +28,7 @@ pipeline {
                     agent any
                     steps {
                         script {
+                            sleep(2)  // Add a slightly larger delay for staggered start
                             executeBuild(params.NAME2, "Execution 2")
                         }
                     }
@@ -35,6 +37,7 @@ pipeline {
                     agent any
                     steps {
                         script {
+                            sleep(3)  // Increase delay further
                             executeBuild(params.NAME3, "Execution 3")
                         }
                     }
@@ -43,6 +46,7 @@ pipeline {
                     agent any
                     steps {
                         script {
+                            sleep(4)  // Increase delay further
                             executeBuild(params.NAME4, "Execution 4")
                         }
                     }
@@ -51,6 +55,7 @@ pipeline {
                     agent any
                     steps {
                         script {
+                            sleep(5)  // Increase delay further
                             executeBuild(params.NAME5, "Execution 5")
                         }
                     }
