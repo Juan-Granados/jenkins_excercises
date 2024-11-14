@@ -51,15 +51,6 @@ pipeline {
                         }
                     }
                 }
-                stage('Parallel Execution 5') {
-                    agent any
-                    steps {
-                        script {
-                            sleep(5)  // Increase delay further
-                            executeBuild(params.NAME5, "Execution 5")
-                        }
-                    }
-                }
             }
         }
     }
