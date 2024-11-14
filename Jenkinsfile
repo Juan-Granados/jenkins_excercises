@@ -14,6 +14,7 @@ pipeline {
     }
     stages {
         stage('Clone Repository') {
+
             agent any  // Runs on the principal (master) agent
             steps {
                 script {
@@ -29,6 +30,7 @@ pipeline {
         stage('Parallel Execution') {
             parallel {
                 stage('Parallel Execution 1') {
+
                     agent any  // Can be any agent for parallel execution
                     steps {
                         script {
