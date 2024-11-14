@@ -5,7 +5,6 @@ pipeline {
         string(name: 'NAME2', defaultValue: 'Maria', description: 'Name for the second agent')
         string(name: 'NAME3', defaultValue: 'Carlos', description: 'Name for the third agent')
         string(name: 'NAME4', defaultValue: 'Ana', description: 'Name for the fourth agent')
-        string(name: 'NAME5', defaultValue: 'Pedro', description: 'Name for the fifth agent')
     }
     environment {
         REPO_URL = 'https://github.com/Juan-Granados/jenkins_excercises'
@@ -48,15 +47,6 @@ pipeline {
                         script {
                             sleep(4)  // Increase delay further
                             executeBuild(params.NAME4, "Execution 4")
-                        }
-                    }
-                }
-                stage('Parallel Execution 5') {
-                    agent any
-                    steps {
-                        script {
-                            sleep(5)  // Increase delay further
-                            executeBuild(params.NAME5, "Execution 5")
                         }
                     }
                 }
