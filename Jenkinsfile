@@ -64,10 +64,6 @@ def executeBuild(String name, String executionName) {
         echo "Cleaning the workspace for ${name} (${executionName})"
         cleanWs()
 
-        // Unstash the repository to the current agent workspace
-        echo "Unstashing repository for ${name} (${executionName})"
-        unstash 'repo'
-
         // Build with Maven
         echo "Building with Maven for ${name} (${executionName})"
         bat 'mvn clean install'  // Adjusted for Windows
